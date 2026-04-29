@@ -1,37 +1,50 @@
-# Kanser Hastaligi Tahmini - Makine Ogrenmesi Projesi
+# Kanser Hastalığı Tahmini — Makine Öğrenmesi Projesi
 
-## Proje Açiklamasi
-Bu projede makine ogrenmesi algoritmalari kullanilarak meme kanseri tespiti yapilmaktadir.
-Bir hastanin tumorunun iyi huylu mu kotu huylu mu oldugu tahmin edilmektedir.
+## Proje Açıklaması
 
-## Kullanilan Veri Seti
+Bu projede makine öğrenmesi algoritmaları kullanılarak meme kanseri tespiti yapılmaktadır.
+Bir hastanın tümörünün iyi huylu mu yoksa kötü huylu mu olduğu tahmin edilmektedir.
+
+---
+
+## Kullanılan Veri Seti
+
 - **Veri Seti:** Breast Cancer Wisconsin Dataset
-- **Kaynak:** Scikit-learn kutuphanesi (sklearn.datasets.load_breast_cancer)
+- **Kaynak:** Scikit-learn kütüphanesi (`sklearn.datasets.load_breast_cancer`)
 - **Link:** https://scikit-learn.org/stable/modules/generated/sklearn.datasets.load_breast_cancer.html
-- **Boyut:** 569 hasta, 30 ozellik
-- **Etiketler:** 0 = Kotu Huylu (Kanser), 1 = Iyi Huylu (Saglikli)
+- **Boyut:** 569 hasta, 30 özellik
+- **Sınıf Dağılımı:** %62 iyi huylu (357), %38 kötü huylu (212) — **dengesiz veri**
+- **Etiketler:** `0` = Kötü huylu (kanser), `1` = İyi huylu (sağlıklı)
 
-## Veri On Isleme Adimlari
-- Eksik veri kontrolu yapildi (eksik veri bulunmadi)
-- Ozellikler StandardScaler ile olceklendirildi
-- Veri %80 egitim %20 test olarak bolundu
-- Korelasyon analizi yapildi
+---
 
-## Kullanilan Algoritmalar
+## Veri Ön İşleme Adımları
+
+- Eksik veri kontrolü yapıldı (eksik veri bulunmadı)
+- Özellikler `StandardScaler` ile ölçeklendirildi
+- Veri %80 eğitim / %20 test olacak şekilde bölündü
+- Korelasyon analizi yapıldı
+- ⚠️ **Eksik:** 5-fold cross-validation uygulanmadı — tek split sonuçları istatistiksel olarak güvenilmez
+
+---
+
+## Kullanılan Algoritmalar
 
 ### 1. Logistic Regression
-Her ozelligin agirligini hesaplayarak sinif tahmini yapar. Temiz verilerde cok basarilidir.
+Her özelliğin ağırlığını hesaplayarak sınıf tahmini yapar. Temiz, lineer ayrılabilir verilerde oldukça başarılıdır. Bu veri setinde en yüksek skoru vermiştir.
 
 ### 2. Decision Tree
-Ozelliklere gore dallanarak karar verir. Anlasilmasi kolay bir modeldir.
+Özelliklere göre dallanarak karar verir. Anlaşılması kolay ancak overfitting'e yatkın bir modeldir. Hyperparameter optimizasyonu yapılmadan bırakıldığından en düşük performansı göstermiştir.
 
 ### 3. Random Forest
-100 karar agacinin oylamasiyla tahmin uretir. Asiri ogrenmeye karsi dayaniklidir.
+100 karar ağacının oylamasıyla tahmin üretir. Aşırı öğrenmeye karşı dayanıklıdır ancak bu projede varsayılan parametrelerle kullanıldığından potansiyelinin altında kalmıştır.
 
 ### 4. KNN (K-Nearest Neighbors)
-Yeni hastaya en yakin 5 hastaya bakarak tahmin yapar. Komsuluk bazli bir algoritmadır.
+Yeni hastaya en yakın 5 hastaya bakarak tahmin yapar. Komşuluk temelli bu yöntem, özellik ölçeklendirmesine duyarlıdır.
 
-## Model Performans Karsilastirmasi
+---
+
+## Model Performans Karşılaştırması
 
 | Model               | Accuracy | Precision | Recall | F1 Score |
 |---------------------|----------|-----------|--------|----------|
@@ -40,14 +53,46 @@ Yeni hastaya en yakin 5 hastaya bakarak tahmin yapar. Komsuluk bazli bir algorit
 | Random Forest       | 0.9386   | 0.9390    | 0.9386 | 0.9387   |
 | KNN                 | 0.9386   | 0.9390    | 0.9386 | 0.9387   |
 
-## Sonuc ve Yorumlar
-- En iyi model **Logistic Regression** oldu, %98.2 basari orani ile one cikti
-- Decision Tree en dusuk performansi gosterdi, egitim verisini fazla ezberledi
-- Veri seti temiz ve duzenli oldugu icin tum modeller yuksek basari gosterdi
-- Gercek hastane verisinde basari oranlari daha dusuk cikabilir
+> ⚠️ **Önemli Not:** Metrikler tek bir train/test split'e dayanmaktadır. 5-fold cross-validation ile sonuçlar farklılık gösterebilir. Ayrıca sınıf dengesizliği nedeniyle sadece Accuracy değerine güvenmek yanıltıcı olabilir; AUC-ROC eğrisi daha güvenilir bir metrik olurdu.
 
-## Kodlarin Nasil Calistirilacagi
-1. Google Colab'i acin: https://colab.research.google.com
-2. Untitled1.ipynb dosyasini yukleyin
-3. Calisma zamani → Tumunu calistir secin
-4. Hucreleri sirayla calistirin
+---
+
+## Bilinen Zayıf Noktalar ve İyileştirme Önerileri
+
+| Sorun | Açıklama | Çözüm |
+|-------|----------|-------|
+| Tek train/test split | İstatistiksel güvenilirlik düşük | 5-fold cross-validation ekle |
+| Hyperparameter optimizasyonu yok | Random Forest ve KNN varsayılan parametrelerle çalışıyor | GridSearchCV veya RandomizedSearchCV kullan |
+| AUC-ROC eksik | Sınıf dengesizliğinde Accuracy yanıltıcı | ROC eğrisi ve Confusion Matrix ekle |
+| Veri seti küçük | 569 örnek gerçek dünya için yetersiz | Daha büyük, gerçek hastane verisiyle test et |
+
+---
+
+## Sonuç ve Yorumlar
+
+- En iyi model **Logistic Regression** oldu — %98.25 doğruluk oranıyla öne çıktı
+- Logistic Regression'ın Random Forest'ı geçmesi, RF modelinin optimize edilmediğine işaret ediyor
+- Decision Tree en düşük performansı gösterdi; eğitim verisini fazla ezberledi (overfitting)
+- Veri seti temiz ve düzenli olduğu için tüm modeller görece yüksek başarı gösterdi
+- Gerçek hastane verilerinde başarı oranları önemli ölçüde düşebilir
+
+---
+
+## Kodların Nasıl Çalıştırılacağı
+
+1. Google Colab'i açın: https://colab.research.google.com
+2. `Untitled1.ipynb` dosyasını yükleyin
+3. **Çalışma Zamanı → Tümünü Çalıştır** seçin
+4. Hücreleri sırasıyla çalıştırın
+
+---
+
+## Gereksinimler
+
+```
+scikit-learn
+pandas
+numpy
+matplotlib
+seaborn
+```
