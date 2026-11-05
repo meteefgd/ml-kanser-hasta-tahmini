@@ -1,4 +1,4 @@
-[README.md](https://github.com/user-attachments/files/34423768/README.3.md)
+[README (4).md](https://github.com/user-attachments/files/34424046/README.4.md)
 # Meme Sağlığı Rehberi
 
 Meme sağlığı farkındalığı için hazırlanmış bir web uygulaması ve bu uygulamanın arkasındaki makine öğrenmesi çalışması. Proje iki bölümden oluşur:
@@ -122,6 +122,10 @@ Proje eğitim amaçlıdır ve ticari kullanıma yönelik değildir. Kaynak kod i
 
 ## Yazar
 
-**Mete Gündoğdu**
-Bartın Üniversitesi Meslek Yüksekokulu, Robotik ve Yapay Zeka Programı
+**Mete Gündoğdu**  
+Bartın Üniversitesi Meslek Yüksekokulu, Robotik ve Yapay Zeka Programı  
 GitHub: [github.com/meteefgd](https://github.com/meteefgd)
+
+**Soykan Gülelçin**  
+Bartın Üniversitesi Meslek Yüksekokulu, Robotik ve Yapay Zeka Programı  
+GitHub: [github.com/soykangulelcin](https://github.com/soykangulelcin)
