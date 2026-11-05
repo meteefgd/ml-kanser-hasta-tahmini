@@ -53,12 +53,14 @@ def hazirla():
 X, y, Xte, yte, egitilmis, sonuc_df, cms = hazirla()
 
 st.title("🩺 Meme Kanseri Tahmini")
-st.caption("Breast Cancer Wisconsin veri seti • Eğitim amaçlı proje — tıbbi teşhis aracı DEĞİLDİR.")
+st.caption("Eğitim amaçlı proje — tıbbi teşhis aracı DEĞİLDİR. Memenizde bir değişiklik fark ederseniz beklemeden bir doktora başvurun.")
 
-tab1, tab2, tab3 = st.tabs(["Tahmin", "Model Karşılaştırma", "Veri Seti"])
+tab4, tab1, tab2, tab3 = st.tabs(["🩺 Belirti Rehberi", "🔬 Model Tahmini", "📊 Model Karşılaştırma", "🗂 Veri Seti"])
 
 # ---------------- TAHMİN ----------------
 with tab1:
+    st.info("🔬 **Meraklısına:** Bu ve sonraki sekmeler, projenin makine öğrenmesi tarafıdır. "
+            "Modeller Breast Cancer Wisconsin veri setiyle eğitildi ve hücre çekirdeği ölçümlerini girdi olarak alır.")
     sol, sag = st.columns([1, 2])
     with sol:
         model_ad = st.selectbox("Model", list(MODELLER), index=0)
@@ -119,3 +121,48 @@ with tab3:
     b.metric("Kötü huylu", int((y == 0).sum()))
     c3.metric("İyi huylu", int((y == 1).sum()))
     st.dataframe(X.describe().T.round(3), width="stretch")
+
+# ---------------- BELİRTİ REHBERİ ----------------
+with tab4:
+    st.subheader("Belirti Rehberi (kural tabanlı)")
+    st.warning("Bu bölüm makine öğrenmesi modeli DEĞİL, basit bir bilgilendirme aracıdır. "
+               "Teşhis koymaz; belirti seçmemiş olmanız kanser olmadığınız anlamına gelmez.")
+    st.markdown("**Son zamanlarda fark ettiğiniz değişiklikleri işaretleyin:**")
+    onemli = {
+        "Memede veya koltuk altında yeni bir sertlik / ele gelen kitle": 2,
+        "Meme ucundan kanlı veya kendiliğinden gelen akıntı": 2,
+        "Meme derisinde çukurlaşma, portakal kabuğu görünümü veya kızarıklık": 2,
+        "Memenin boyut ya da şeklinde belirgin, tek taraflı değişiklik": 2,
+    }
+    diger = {
+        "Meme ucunda yeni içe çekilme": 1,
+        "Meme ucu veya çevresinde pullanma / kabuklanma": 1,
+        "Düzelmeyen, tek bölgede süren meme ağrısı": 1,
+    }
+    risk = {
+        "Birinci derece akrabamda (anne, kız kardeş) meme kanseri öyküsü var": 1,
+        "Daha önce meme ile ilgili biyopsi / tedavi öyküm var": 1,
+    }
+    puan, risk_var = 0, False
+    for k, v in {**onemli, **diger}.items():
+        if st.checkbox(k, key="b_" + k):
+            puan = max(puan, v)
+    st.markdown("**Risk faktörleri:**")
+    for k in risk:
+        if st.checkbox(k, key="r_" + k):
+            risk_var = True
+
+    st.divider()
+    if puan == 2:
+        st.error("### Bir doktora başvurmanız önerilir\n"
+                 "Seçtiğiniz belirtiler değerlendirme gerektirir. Mümkün olan en kısa sürede "
+                 "bir aile hekimine, genel cerrahi veya meme kliniğine başvurun. "
+                 "Bu belirtiler çoğu zaman iyi huylu nedenlerle de olabilir; ayırt etmek doktorun işidir.")
+    elif puan == 1 or risk_var:
+        st.warning("### Doktorunuza danışın\n"
+                   "Seçtiğiniz belirti veya risk faktörü bir sağlık uzmanıyla konuşmaya değer. "
+                   "Yakın bir zamanda randevu alın ve düzenli kontrollerinizi aksatmayın.")
+    else:
+        st.info("### Belirti seçilmedi\n"
+                "Bu, risk olmadığı anlamına gelmez. Yaşınıza uygun düzenli tarama ve kontrolleri "
+                "sürdürün, memelerinizde bir değişiklik fark ederseniz beklemeden doktora gidin.")
