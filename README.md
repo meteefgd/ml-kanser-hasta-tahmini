@@ -1,98 +1,45 @@
-# Kanser Hastalığı Tahmini — Makine Öğrenmesi Projesi
+[README.md](https://github.com/user-attachments/files/34421123/README.md)
+# Meme Kanseri Tahmini — Makine Öğrenmesi + Web Arayüzü
 
-## Proje Açıklaması
+Breast Cancer Wisconsin veri seti ile bir tümörün **iyi huylu** mu **kötü huylu** mu olduğunu tahmin eden 4 modelin karşılaştırması ve bu modelleri kullanan Streamlit arayüzü.
 
-Bu projede makine öğrenmesi algoritmaları kullanılarak meme kanseri tespiti yapılmaktadır.
-Bir hastanın tümörünün iyi huylu mu yoksa kötü huylu mu olduğu tahmin edilmektedir.
+> Eğitim amaçlı projedir, tıbbi teşhis aracı değildir.
 
----
+## Veri Seti
+- Kaynak: `sklearn.datasets.load_breast_cancer`
+- 569 hasta, 30 özellik, eksik veri yok
+- Etiketler: `0` = kötü huylu (212), `1` = iyi huylu (357) — hafif dengesiz
+- %80 eğitim / %20 test (`stratify=y`, `random_state=42`), `StandardScaler` Pipeline içinde
 
-## Kullanılan Veri Seti
+## Sonuçlar (gerçek model çıktıları, test seti = 114 hasta)
 
-- **Veri Seti:** Breast Cancer Wisconsin Dataset
-- **Kaynak:** Scikit-learn kütüphanesi (`sklearn.datasets.load_breast_cancer`)
-- **Link:** https://scikit-learn.org/stable/modules/generated/sklearn.datasets.load_breast_cancer.html
-- **Boyut:** 569 hasta, 30 özellik
-- **Sınıf Dağılımı:** %62 iyi huylu (357), %38 kötü huylu (212) — **dengesiz veri**
-- **Etiketler:** `0` = Kötü huylu (kanser), `1` = İyi huylu (sağlıklı)
+| Model | Accuracy | Kanser Recall | Kanser Precision | F1 (kanser) | AUC-ROC | 5-Fold CV Acc |
+|---|---|---|---|---|---|---|
+| Logistic Regression | 0.9825 | 0.9762 | 0.9762 | 0.9762 | 0.9954 | 0.9737 |
+| Decision Tree | 0.9123 | 0.9286 | 0.8478 | 0.8864 | 0.9157 | 0.9104 |
+| Random Forest | 0.9561 | 0.9286 | 0.9512 | 0.9398 | 0.9939 | 0.9561 |
+| KNN (k=5) | 0.9561 | 0.9286 | 0.9512 | 0.9398 | 0.9788 | 0.9631 |
 
----
+**Yorum**
+- Kanser tespitinde en kritik metrik *kanser recall*'dır (gerçek kanserlerin kaçı yakalandı). Bir kanseri kaçırmak yanlış alarmdan çok daha pahalıdır.
+- Logistic Regression her metrikte önde, ancak test setinde 114 hasta olduğu için 1-2 hastalık farklar gürültü sayılır. 5-fold CV'de LR, RF ve KNN birbirine yakındır (%95.6 – %97.4).
+- Decision Tree her ölçüte göre en zayıf modeldir (budanmamış tek ağaç, aşırı öğrenmeye yatkın).
+- Veri seti temiz ve küçüktür; gerçek hastane verisinde skorların düşmesi beklenir.
+- Hiperparametre optimizasyonu (GridSearchCV) yapılmadı; sonraki adım olarak eklenebilir.
 
-## Veri Ön İşleme Adımları
+## Dosyalar
+- `kanser_tahmini.ipynb` — analiz ve model karşılaştırması
+- `app.py` — Streamlit arayüzü (tahmin, model karşılaştırma, veri seti sekmeleri)
+- `requirements.txt`
 
-- Eksik veri kontrolü yapıldı (eksik veri bulunmadı)
-- Özellikler `StandardScaler` ile ölçeklendirildi
-- Veri %80 eğitim / %20 test olacak şekilde bölündü
-- Korelasyon analizi yapıldı
-- ⚠️ **Eksik:** 5-fold cross-validation uygulanmadı — tek split sonuçları istatistiksel olarak güvenilmez
-
----
-
-## Kullanılan Algoritmalar
-
-### 1. Logistic Regression
-Her özelliğin ağırlığını hesaplayarak sınıf tahmini yapar. Temiz, lineer ayrılabilir verilerde oldukça başarılıdır. Bu veri setinde en yüksek skoru vermiştir.
-
-### 2. Decision Tree
-Özelliklere göre dallanarak karar verir. Anlaşılması kolay ancak overfitting'e yatkın bir modeldir. Hyperparameter optimizasyonu yapılmadan bırakıldığından en düşük performansı göstermiştir.
-
-### 3. Random Forest
-100 karar ağacının oylamasıyla tahmin üretir. Aşırı öğrenmeye karşı dayanıklıdır ancak bu projede varsayılan parametrelerle kullanıldığından potansiyelinin altında kalmıştır.
-
-### 4. KNN (K-Nearest Neighbors)
-Yeni hastaya en yakın 5 hastaya bakarak tahmin yapar. Komşuluk temelli bu yöntem, özellik ölçeklendirmesine duyarlıdır.
-
----
-
-## Model Performans Karşılaştırması
-
-| Model               | Accuracy | Precision | Recall | F1 Score |
-|---------------------|----------|-----------|--------|----------|
-| Logistic Regression | 0.9825   | 0.9825    | 0.9825 | 0.9825   |
-| Decision Tree       | 0.8860   | 0.8887    | 0.8860 | 0.8867   |
-| Random Forest       | 0.9386   | 0.9390    | 0.9386 | 0.9387   |
-| KNN                 | 0.9386   | 0.9390    | 0.9386 | 0.9387   |
-
-> ⚠️ **Önemli Not:** Metrikler tek bir train/test split'e dayanmaktadır. 5-fold cross-validation ile sonuçlar farklılık gösterebilir. Ayrıca sınıf dengesizliği nedeniyle sadece Accuracy değerine güvenmek yanıltıcı olabilir; AUC-ROC eğrisi daha güvenilir bir metrik olurdu.
-
----
-
-## Bilinen Zayıf Noktalar ve İyileştirme Önerileri
-
-| Sorun | Açıklama | Çözüm |
-|-------|----------|-------|
-| Tek train/test split | İstatistiksel güvenilirlik düşük | 5-fold cross-validation ekle |
-| Hyperparameter optimizasyonu yok | Random Forest ve KNN varsayılan parametrelerle çalışıyor | GridSearchCV veya RandomizedSearchCV kullan |
-| AUC-ROC eksik | Sınıf dengesizliğinde Accuracy yanıltıcı | ROC eğrisi ve Confusion Matrix ekle |
-| Veri seti küçük | 569 örnek gerçek dünya için yetersiz | Daha büyük, gerçek hastane verisiyle test et |
-
----
-
-## Sonuç ve Yorumlar
-
-- En iyi model **Logistic Regression** oldu — %98.25 doğruluk oranıyla öne çıktı
-- Logistic Regression'ın Random Forest'ı geçmesi, RF modelinin optimize edilmediğine işaret ediyor
-- Decision Tree en düşük performansı gösterdi; eğitim verisini fazla ezberledi (overfitting)
-- Veri seti temiz ve düzenli olduğu için tüm modeller görece yüksek başarı gösterdi
-- Gerçek hastane verilerinde başarı oranları önemli ölçüde düşebilir
-
----
-
-## Kodların Nasıl Çalıştırılacağı
-
-1. Google Colab'i açın: https://colab.research.google.com
-2. `Untitled1.ipynb` dosyasını yükleyin
-3. **Çalışma Zamanı → Tümünü Çalıştır** seçin
-4. Hücreleri sırasıyla çalıştırın
-
----
-
-## Gereksinimler
-
+## Çalıştırma
 ```
-scikit-learn
-pandas
-numpy
-matplotlib
-seaborn
+pip install -r requirements.txt
+streamlit run app.py
 ```
+
+## Yayınlama (Streamlit Community Cloud)
+1. Dosyaları GitHub reposuna yükle.
+2. https://share.streamlit.io adresinde GitHub ile giriş yap, **New app** de.
+3. Repo ve `app.py` dosyasını seç, **Deploy**'a bas.
+4. Oluşan `*.streamlit.app` linkini paylaş.
