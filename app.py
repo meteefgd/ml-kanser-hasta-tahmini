@@ -12,12 +12,12 @@ from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import StandardScaler
 from sklearn.tree import DecisionTreeClassifier
 
-st.set_page_config(page_title="Meme Sağlığı Rehberi", page_icon="🎀", layout="centered")
+st.set_page_config(page_title="Meme Sağlığı Rehberi", layout="centered")
 
-# >>> Yayınlamadan önce kendi bilgilerinle doldur <<<
-PROJE_SAHIBI = "[Ad Soyad]"
-KURUM = "[Okul / Program adı]"
-ILETISIM = "[e-posta adresi]"
+# Proje bilgileri
+PROJE_SAHIBI = "Mete Gündoğdu"
+KURUM = "Bartın Üniversitesi Meslek Yüksekokulu, Robotik ve Yapay Zeka Programı"
+ILETISIM = "GitHub: github.com/meteefgd"
 
 st.markdown("""
 <style>
@@ -71,17 +71,17 @@ def hazirla():
 
 X, y, Xte, yte, egitilmis, sonuc_df, cms = hazirla()
 
-st.markdown('''<div class="hero"><h1>🎀 Meme Sağlığı Rehberi</h1>
+st.markdown('''<div class="hero"><h1>Meme Sağlığı Rehberi</h1>
 <p>Belirtileri tanıyın, taramanızı aksatmayın, gerekirse zamanında doktora başvurun.</p></div>''', unsafe_allow_html=True)
 
 tab_belirti, tab_tarama, tab_ml, tab_yasal = st.tabs(
-    ["🩺 Belirti Rehberi", "📅 Tarama ve Kontrol", "🔬 Merak Edenler İçin", "⚖️ Yasal Bilgiler"])
+    ["Belirti Rehberi", "Tarama ve Kontrol", "Teknik Bilgiler", "Yasal Bilgiler"])
 with tab_ml:
     tab1, tab2, tab3 = st.tabs(["Model Tahmini", "Model Karşılaştırma", "Veri Seti"])
 
 # ---------------- TAHMİN ----------------
 with tab1:
-    st.info("🔬 **Teknik taraf:** Bu bölüm projenin makine öğrenmesi kısmıdır. "
+    st.info("**Teknik bilgi:** Bu bölüm projenin makine öğrenmesi kısmıdır. "
             "Modeller Breast Cancer Wisconsin veri setiyle eğitildi ve hücre çekirdeği ölçümlerini girdi olarak alır.")
     sol, sag = st.columns([1, 2])
     with sol:
@@ -111,9 +111,9 @@ with tab1:
     p0 = 1 - p1
     with sag:
         if p0 >= 0.5:
-            st.error(f"### ❌ KÖTÜ HUYLU (kanser) — %{p0*100:.1f}")
+            st.error(f"### Kötü huylu (kanser) olasılığı yüksek: %{p0*100:.1f}")
         else:
-            st.success(f"### ✅ İYİ HUYLU — %{p1*100:.1f}")
+            st.success(f"### İyi huylu olasılığı yüksek: %{p1*100:.1f}")
         st.progress(float(p0), text=f"Kötü huylu olasılığı: %{p0*100:.1f}")
         if "gercek" in st.session_state:
             g = "İyi huylu" if st.session_state["gercek"] == 1 else "Kötü huylu"
